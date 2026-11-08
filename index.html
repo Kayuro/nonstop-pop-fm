@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Non-Stop-Pop FM · En direct</title>
+  <meta name="description" content="Radio Non-Stop-Pop FM en direct, synchronisée pour tout le monde (projet de fan).">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="stage">
+    <section class="brand">
+      <div class="logo-wrap slot" id="logoSlot">
+        <img src="assets/logo.png" alt="Non-Stop-Pop FM" id="logo">
+        <span class="fm">FM</span>
+        <p class="slot-msg">Dépose ton logo dans <code>assets/logo.png</code></p>
+      </div>
+
+      <p class="live"><span class="dot"></span> EN DIRECT · 100.7 FM</p>
+
+      <button id="playBtn" class="play" type="button">
+        <svg id="iconPlay" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+        <svg id="iconPause" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" hidden><path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor"/></svg>
+        <span id="playLabel">Écouter</span>
+      </button>
+
+      <p class="status" id="status" role="status">Prêt</p>
+
+      <label class="volume">
+        <span>Volume</span>
+        <input type="range" id="volume" min="0" max="100" step="1" value="80">
+      </label>
+
+      <div class="video" id="videoWrap" hidden><div id="ytPlayer"></div></div>
+    </section>
+
+    <div class="girl-wrap slot" id="girlSlot">
+      <img class="girl" src="assets/girl.png" alt="" id="girl">
+      <p class="slot-msg">Dépose ton image dans <code>assets/girl.png</code></p>
+    </div>
+  </main>
+
+  <footer>Projet de fan non officiel, sans lien avec Rockstar Games. Les marques appartiennent à leurs propriétaires.</footer>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

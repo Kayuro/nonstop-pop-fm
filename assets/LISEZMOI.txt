@@ -1,0 +1,6 @@
+Dépose ici tes deux images :
+
+  logo.png  -> le logo Non-Stop-Pop (PNG à fond transparent de préférence)
+  girl.png  -> le personnage à droite (PNG à fond transparent de préférence)
+
+Tant qu'elles sont absentes, la page affiche un cadre pointillé à leur place.
