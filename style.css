@@ -1,6 +1,8 @@
 :root {
   --coral: #ff6b6b;
-  --ink: #3a2a3f;
+  --ink: #fff;
+  --glass: rgba(20, 10, 32, .42);
+  --ease: cubic-bezier(.2, .7, .2, 1);
 }
 * { box-sizing: border-box; }
 [hidden], img[hidden] { display: none !important; }
@@ -15,8 +17,31 @@ body {
   padding: 32px 20px 56px;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: var(--ink);
-  background: linear-gradient(180deg, #b4f7bd 0%, #f0dcb8 50%, #ffb1b8 100%) fixed;
+  -webkit-font-smoothing: antialiased;
+  /* Fond de secours si la vidéo est absente */
+  background: linear-gradient(180deg, #7b2ff7 0%, #c2409a 50%, #ff7a59 100%) fixed;
   overflow-x: hidden;
+}
+
+/* ---------- Fond vidéo ---------- */
+.bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+  pointer-events: none;
+}
+.bg.ready { opacity: 1; }
+.bg-shade {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, .12) 0%, rgba(0, 0, 0, .55) 100%);
 }
 
 /* ---------- Carte centrale ---------- */
@@ -32,26 +57,37 @@ body {
   padding: 34px 28px 28px;
   text-align: center;
   border-radius: 28px;
-  background: rgba(255, 255, 255, .35);
-  border: 1px solid rgba(255, 255, 255, .65);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 20px 50px rgba(58, 42, 63, .18);
+  background: var(--glass);
+  border: 1px solid rgba(255, 255, 255, .18);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
+  animation: rise .9s var(--ease) both;
 }
+.player > * { animation: fadeUp .7s var(--ease) both; }
+.player > :nth-child(1) { animation-delay: .10s; }
+.player > :nth-child(2) { animation-delay: .18s; }
+.player > :nth-child(3) { animation-delay: .26s; }
+.player > :nth-child(4) { animation-delay: .34s; }
+.player > :nth-child(5) { animation-delay: .42s; }
+.player > :nth-child(6) { animation-delay: .50s; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 
 /* ---------- Logo ---------- */
 .logo { position: relative; display: inline-block; }
-.logo img { display: block; width: min(230px, 60vw); height: auto; }
+.logo img { display: block; width: min(320px, 70vw); height: auto; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .35)); }
 .fm {
   position: absolute;
-  top: 6%;
-  left: 100%;
-  margin-left: 8px;
+  top: 10%;
+  left: 74%;
+  margin-left: 0;
   color: #fff;
   font-weight: 800;
   font-size: 1.5rem;
   letter-spacing: .03em;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, .15);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
 }
 
 /* ---------- En direct ---------- */
@@ -62,22 +98,25 @@ body {
   gap: 8px;
   padding: 7px 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, .6);
+  background: rgba(255, 255, 255, .14);
+  border: 1px solid rgba(255, 255, 255, .22);
   font-weight: 700;
   font-size: .78rem;
   letter-spacing: .14em;
 }
-.dot { width: 10px; height: 10px; border-radius: 50%; background: #e63946; animation: pulse 1.4s infinite; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #ff4d5e; animation: pulse 1.6s ease-out infinite; }
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(230, 57, 70, .6); }
-  100% { box-shadow: 0 0 0 10px rgba(230, 57, 70, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(255, 77, 94, .65); }
+  100% { box-shadow: 0 0 0 11px rgba(255, 77, 94, 0); }
 }
 
 /* ---------- Titre en cours ---------- */
 .now { width: 100%; min-height: 4.8em; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.now-label { font-size: .68rem; letter-spacing: .22em; font-weight: 700; opacity: .6; }
+.now-label { font-size: .68rem; letter-spacing: .22em; font-weight: 700; opacity: .7; }
+.now-title, .now-artist { transition: opacity .25s ease, transform .25s ease; }
 .now-title { font-size: 1.4rem; line-height: 1.25; font-weight: 800; overflow-wrap: anywhere; }
-.now-artist { font-size: 1rem; opacity: .8; overflow-wrap: anywhere; }
+.now-artist { font-size: 1rem; opacity: .85; overflow-wrap: anywhere; }
+.now-title.fading, .now-artist.fading { opacity: 0; transform: translateY(6px); }
 
 /* ---------- Contrôles ---------- */
 .controls { width: 100%; display: flex; align-items: center; justify-content: center; gap: 22px; }
@@ -94,41 +133,43 @@ body {
   color: #fff;
   background: linear-gradient(135deg, #ff7a59, var(--coral));
   box-shadow: 0 10px 26px rgba(255, 107, 107, .45);
-  transition: transform .15s;
+  transition: transform .25s var(--ease), box-shadow .3s ease, filter .25s ease;
 }
-.play:hover { transform: scale(1.06); }
-.play:active { transform: scale(.96); }
+.play:hover { transform: scale(1.07); filter: brightness(1.06); }
+.play:active { transform: scale(.95); }
+.play svg { animation: pop .3s var(--ease); }
 .play .i-pause { display: none; }
 .play.on .i-play { display: none; }
 .play.on .i-pause { display: block; }
-
-.volume { display: flex; align-items: center; gap: 10px; font-size: .85rem; flex: 1; max-width: 200px; }
-.volume input { flex: 1; min-width: 0; accent-color: var(--coral); }
-
-button:focus-visible, input:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
-
-.status { margin: -6px 0 0; min-height: 1.2em; font-size: .85rem; opacity: .8; }
-.status.error { color: #b3123a; opacity: 1; font-weight: 600; }
-
-/* ---------- Lecteur YouTube (doit rester visible) ---------- */
-.video { width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000; box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
-.video iframe { width: 100%; height: 100%; border: 0; display: block; }
-
-/* ---------- Personnage ---------- */
-.girl {
-  position: fixed;
-  right: 3vw;
-  bottom: 0;
-  z-index: 1;
-  height: min(78vh, 780px);
-  width: auto;
-  max-width: 34vw;
-  object-fit: contain;
-  object-position: bottom right;
-  pointer-events: none;
+.play.on { animation: glow 2.6s ease-in-out infinite; }
+@keyframes pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+@keyframes glow {
+  0%, 100% { box-shadow: 0 10px 26px rgba(255, 107, 107, .45); }
+  50% { box-shadow: 0 10px 40px rgba(255, 107, 107, .8); }
 }
 
-footer { position: fixed; bottom: 8px; left: 0; right: 0; z-index: 3; text-align: center; font-size: .7rem; opacity: .55; pointer-events: none; }
+.volume { display: flex; align-items: center; gap: 10px; font-size: .85rem; flex: 1; max-width: 200px; }
+.volume input { flex: 1; min-width: 0; accent-color: var(--coral); cursor: pointer; }
 
-@media (max-width: 1000px) { .girl { display: none; } }
-@media (prefers-reduced-motion: reduce) { .dot { animation: none; } .play { transition: none; } }
+button:focus-visible, input:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+.status { margin: -6px 0 0; min-height: 1.2em; font-size: .85rem; opacity: .85; transition: opacity .3s ease; }
+.status.error { color: #ffb3c1; opacity: 1; font-weight: 600; }
+
+/* ---------- Lecteur YouTube (doit rester visible) ---------- */
+.video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+  animation: fadeUp .6s var(--ease) both;
+}
+.video iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+footer { position: fixed; bottom: 8px; left: 0; right: 0; z-index: 3; text-align: center; font-size: .7rem; opacity: .6; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
