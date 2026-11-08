@@ -10,12 +10,30 @@
   const videoWrap = document.getElementById("videoWrap");
   const nowTitle = document.getElementById("nowTitle");
   const nowArtist = document.getElementById("nowArtist");
+  const bg = document.getElementById("bgVideo");
 
   // ---------- Images optionnelles : masquées si absentes ----------
   document.querySelectorAll("img[data-optional]").forEach((img) => {
     img.addEventListener("error", () => { img.hidden = true; });
     if (img.complete && img.naturalWidth === 0) img.hidden = true;
   });
+
+  // ---------- Vidéo de fond ----------
+  function dropBackground() {
+    if (bg) bg.remove();
+    const shade = document.querySelector(".bg-shade");
+    if (shade) shade.remove();
+  }
+  if (bg) {
+    bg.muted = true;
+    bg.addEventListener("loadeddata", () => {
+      bg.classList.add("ready");
+      bg.play().catch(() => {});
+    });
+    bg.addEventListener("error", dropBackground);
+    const src = bg.querySelector("source");
+    if (src) src.addEventListener("error", dropBackground);
+  }
 
   // ---------- Interface ----------
   function setStatus(msg, isError = false) {
@@ -25,6 +43,23 @@
   function setPlaying(on) {
     playBtn.classList.toggle("on", on);
     playBtn.setAttribute("aria-label", on ? "Pause" : "Lecture");
+  }
+
+  // Changement de titre en fondu
+  let shown = { t: nowTitle.textContent, a: nowArtist.textContent };
+  let swapTimer = null;
+  function setNow(title, artist) {
+    if (title === shown.t && artist === shown.a) return;
+    shown = { t: title, a: artist };
+    nowTitle.classList.add("fading");
+    nowArtist.classList.add("fading");
+    clearTimeout(swapTimer);
+    swapTimer = setTimeout(() => {
+      nowTitle.textContent = shown.t;
+      nowArtist.textContent = shown.a;
+      nowTitle.classList.remove("fading");
+      nowArtist.classList.remove("fading");
+    }, 250);
   }
 
   // ---------- Liste des titres ----------
@@ -52,12 +87,10 @@
       const t = player.getCurrentTime();
       let cur = TRACKS[0];
       for (const tr of TRACKS) { if (tr.start <= t) cur = tr; else break; }
-      nowTitle.textContent = cur.title;
-      nowArtist.textContent = cur.artist;
+      setNow(cur.title, cur.artist);
     } else {
       const data = player.getVideoData ? player.getVideoData() : null;
-      nowTitle.textContent = (data && data.title) || "Non-Stop-Pop FM";
-      nowArtist.textContent = (data && data.author) || "";
+      setNow((data && data.title) || "Non-Stop-Pop FM", (data && data.author) || "");
     }
   }
 
@@ -142,6 +175,7 @@
 
   async function toggle() {
     if (!YT_ID) { setStatus("Aucun YOUTUBE_ID dans config.js.", true); return; }
+    if (bg && bg.paused) bg.play().catch(() => {});
     videoWrap.hidden = false;
     try {
       setStatus("Chargement…");
